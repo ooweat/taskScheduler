@@ -200,7 +200,7 @@ public class Alert {
 
 
 
-            if(Util.stringUtil(alertModel.getReceiver()).in("sales", "cs", "dev")) {
+            if(Util.stringUtils(alertModel.getReceiver()).in("sales", "cs", "dev")) {
                 switch (alertModel.getReceiver()) {
                     case "sales":
                         message.addRecipients(Message.RecipientType.TO, toSales); //받는 이

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.ooweat.taskScheduler.mappers.oracle.manager.managerMapper">
+	<!-- 오라클 휴일 확인 -->
+	<select id="workDayCheck" resultType="int">
+		<![CDATA[
+			SELECT count(*) cnt
+			FROM (
+			SELECT TO_CHAR (SDT + LEVEL - 1, 'YYYYMMDD') DT,
+			TO_CHAR (SDT + LEVEL - 1, 'D') D
+			FROM (
+			SELECT  TO_DATE ((SELECT TO_CHAR(sysdate,'YYYY')||'0101' FROM DUAL), 'YYYYMMDD') SDT,
+			TO_DATE ((SELECT TO_CHAR(sysdate,'YYYY')||'1231' FROM DUAL), 'YYYYMMDD') EDT
+			FROM DUAL)
+			CONNECT BY LEVEL <= EDT - SDT + 1) A,
+			(
+			SELECT YYYYMMDD DT FROM TBLHOLIDAY-- 휴일정보(테이블)
+			) B
+			WHERE A.DT = B.DT(+)
+			AND A.D NOT IN ('1', '7')  -- 토/일요일 제외
+			AND B.DT IS NULL AND A.DT = TO_CHAR(SYSDATE, 'YYYYmmdd')
+		]]>
+	</select>
+</mapper>
