@@ -179,6 +179,103 @@ public class Alert {
                                 "													   "
                                 + "감사합니다." +
                                 "<br>\n");
+            }else if (alertModel.getService().equalsIgnoreCase("vmDiskUsageCheck")) {
+                //NOTE: Content subTitle
+                sb.append(
+                    Util.StringUtil.contentSubTitle(alertModel.getTitle(),
+                        "리포트",
+                        "발송되었습니다."
+                    )
+                );
+                //NOTE: Content Table Header
+                sb.append(Util.StringUtil.contentTableHeader());
+                sb.append("" +
+                    "<table cellspacing=\"0\" width=\"100%\" style=\"table-layout: fixed; margin-top: 16px; border: 1px solid rgb(219, 219, 219); border-collapse: collapse; color: rgb(85, 85, 85); font-family: 나눔고딕, NanumGothic, sans-serif; font-size: 12px; line-height: 18px;\"> \n"
+                    +
+                    "         <thead style=\"box-sizing: border-box;\">" +
+                    "               <tr style=\"box-sizing: border-box;\">" +
+                    "                       <th colspan=\"1\" rowspan=\"1\" style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle; background: rgb(245, 245, 247);\"> Host IP </th>"
+                    +
+                    "                       <th colspan=\"1\" rowspan=\"1\" style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle; background: rgb(245, 245, 247);\"> 서비스 </th>"
+                    +
+                    "                       <th colspan=\"1\" rowspan=\"1\" style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle; background: rgb(245, 245, 247);\"> 파티션 </th>"
+                    +
+                    "                       <th colspan=\"1\" rowspan=\"1\" style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle; background: rgb(245, 245, 247);\"> 할당경로 </th>"
+                    +
+                    "                       <th colspan=\"1\" rowspan=\"1\" style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle; background: rgb(245, 245, 247);\"> 할당용량 </th>"
+                    +
+                    "                       <th colspan=\"1\" rowspan=\"1\" style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle; background: rgb(245, 245, 247);\"> 사용중 </th>"
+                    +
+                    "                       <th colspan=\"1\" rowspan=\"1\" style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle; background: yellow;\"> 사용량(%) </th>"
+                    +
+                    "                       <th colspan=\"1\" rowspan=\"1\" style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle; background: rgb(245, 245, 247);\"> 총 메모리 </th>"
+                    +
+/*                    "                       <th colspan=\"1\" rowspan=\"1\" style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle; background: rgb(245, 245, 247);\"> free 메모리 </th>"
+                    +*/
+                    "                       <th colspan=\"1\" rowspan=\"1\" style=\"box-sizing: border-box; pading: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle; background: rgb(245, 245, 247);\"> 남은 메모리 </th>"
+                    +
+                    "                       <th colspan=\"1\" rowspan=\"1\" style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle; background: yellow;\"> 사용량(%) </th>"
+                    +
+
+                    "               </tr>" +
+                    "         </thead> \n" +
+                    "         <tbody style=\"box-sizing: border-box;\">");
+                //NOTE: Content Table
+                for (int i = 0; i < alertModel.getParamListMap().size(); i++) {
+                    float usedMem = 0;
+                    float totalMem = 0;
+
+                    usedMem =
+                        alertModel.getParamListMap().get(i).get("MemAvailable").contains("MB") ?
+                            Float.parseFloat(
+                                (alertModel.getParamListMap().get(i).get("MemAvailable"))
+                                    .replaceAll("MB", "")) / 1000
+                            :
+                                Float.parseFloat(
+                                    alertModel.getParamListMap().get(i).get("MemAvailable")
+                                        .replaceAll("GB", ""));
+
+                    totalMem =
+                        alertModel.getParamListMap().get(i).get("MemTotal").contains("MB") ?
+                            Float.parseFloat(
+                                (alertModel.getParamListMap().get(i).get("MemTotal"))
+                                    .replaceAll("MB", "")) / 1000
+                            :
+                                Float.parseFloat(
+                                    alertModel.getParamListMap().get(i).get("MemTotal")
+                                        .replaceAll("GB", ""));
+                    //MEMO: twkim 2023.02.14 가독성을 위해 아래 시안으로 변경
+                    sb.append("         <tr style=\"box-sizing: border-box;\">" +
+                        "               <td style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); vertical-align: middle;\">"
+                        + alertModel.getParamListMap().get(i).get("host") + " </td>" +
+                        "               <td style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); vertical-align: middle;\">"
+                        + alertModel.getParamListMap().get(i).get("service") + " </td>" +
+                        "               <td style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); vertical-align: middle;\">"
+                        + alertModel.getParamListMap().get(i).get("partition") + " </td>" +
+                        "               <td style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); vertical-align: middle;\">"
+                        + alertModel.getParamListMap().get(i).get("path") + " </td>" +
+                        "               <td style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle;\">"
+                        + alertModel.getParamListMap().get(i).get("size") + " </td>" +
+                        "               <td style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle;\">"
+                        + alertModel.getParamListMap().get(i).get("used") + " </td>" +
+                        "               <td style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle;\">"
+                        + alertModel.getParamListMap().get(i).get("percent") + " </td>" +
+                        "               <td style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle;\">"
+                        + alertModel.getParamListMap().get(i).get("MemTotal") + " </td>" +
+/*                        "               <td style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle;\">"
+                        + alertModel.getParamListMap().get(i).get("MemFree") + " </td>" +*/
+                        "               <td style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle;\">"
+                        + alertModel.getParamListMap().get(i).get("MemAvailable") + " </td>" +
+                        "               <td style=\"box-sizing: border-box; padding: 5px 10px; border: 1px solid rgb(238, 238, 240); text-align: center; vertical-align: middle;\">"
+                        + String.valueOf((100 - Math.round(usedMem / (totalMem / 100) * 1000) / 1000.0)).substring(0, 5)
+                        + "%" + " </td>" +
+                        "           </tr>");
+                }
+                sb.append("         </tbody>" +
+                    "</table>");
+
+                //NOTE: Content Table Footer
+                sb.append(Util.StringUtil.contentTableFooter());
             }
 
             //HINT: Footer
@@ -200,7 +297,7 @@ public class Alert {
 
 
 
-            if(Util.stringUtils(alertModel.getReceiver()).in("sales", "cs", "dev")) {
+            if(Util.stringUtil(alertModel.getReceiver()).in("sales", "cs", "dev")) {
                 switch (alertModel.getReceiver()) {
                     case "sales":
                         message.addRecipients(Message.RecipientType.TO, toSales); //받는 이
