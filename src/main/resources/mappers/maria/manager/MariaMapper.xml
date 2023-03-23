@@ -2,10 +2,92 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.ooweat.taskScheduler.mappers.maria.manager.managerMapper">
 	<resultMap id="wsrepResult" type="Map" autoMapping="true"></resultMap>
-
+	<select id="workDayCheck" parameterType="String" resultType="int">
+		<![CDATA[
+		-- Maria 에서는 기존 Function 활용
+		SELECT IF(IS_HOLIDAY(#{today}) = 1, 0, 1) AS cnt;
+		]]>
+	</select>
 	<select id="galleraInfo" resultMap="wsrepResult">
 		<![CDATA[
 			show global status like 'wsrep_cluster_size%'
 		]]>
+	</select>
+	<update id="createKakaoLogYYYYMM" parameterType="string">
+		CREATE TABLE msg.KAKAO_LOG_${yyyyMM}
+		(
+			MSG_KEY        DECIMAL(15)   NOT NULL COMMENT '키',
+			PHONE          VARCHAR(14)   NOT NULL COMMENT '연락처',
+			KAKAO_TYPE     VARCHAR(10) NULL COMMENT '발송종류',
+			KAKAO_UID      DECIMAL(18) NULL COMMENT '카카오uid',
+			KAKAO_MSG      VARCHAR(2000) NOT NULL COMMENT '알림톡 내용',
+			RESCODE        VARCHAR(20) NULL COMMENT '응답결과',
+			MEMO           VARCHAR(100) NULL COMMENT '메모',
+			CREATE_DATE    DATE          NOT NULL COMMENT 'Queue생성시간',
+			SEND_DATE      DATE NULL COMMENT '발송시간/로그생성시간',
+			ETC1           VARCHAR(64) NULL COMMENT '기타1',
+			ETC2           VARCHAR(32) NULL COMMENT '기타2',
+			TERMINAL_ID    VARCHAR(12) NULL COMMENT '단말기ID',
+			TRANSACTION_NO VARCHAR(18) NULL COMMENT '상태고유번호'
+		);
+
+
+	</update>
+	<select id="checkCreatedKakaoLogTable" parameterType="string" resultType="int">
+		SELECT COUNT(*)
+		FROM information_schema.TABLES
+		WHERE TABLE_NAME = 'KAKAO_LOG_${yyyyMM}';
+	</select>
+	<update id="createMMSLogYYYYMM" parameterType="string">
+		CREATE TABLE msg.MMS_LOG_${yyyyMM}
+		(
+			MSGKEY             DECIMAL(11)                 NOT NULL,
+			SUBJECT            VARCHAR(120)                NULL,
+			PHONE              VARCHAR(15)                 NOT NULL,
+			CALLBACK           VARCHAR(15)                 NOT NULL,
+			STATUS             VARCHAR(2)  DEFAULT '0'     NOT NULL,
+			REQDATE            DATETIME                    NOT NULL,
+			MSG                VARCHAR(4000)               NULL,
+			FILE_CNT           INT         DEFAULT 0       NULL,
+			FILE_CNT_REAL      INT         DEFAULT 0       NULL,
+			FILE_PATH1         VARCHAR(128)                NULL,
+			FILE_PATH1_SIZ     INT                         NULL,
+			FILE_PATH2         VARCHAR(128)                NULL,
+			FILE_PATH2_SIZ     INT                         NULL,
+			FILE_PATH3         VARCHAR(128)                NULL,
+			FILE_PATH3_SIZ     INT                         NULL,
+			FILE_PATH4         VARCHAR(128)                NULL,
+			FILE_PATH4_SIZ     INT                         NULL,
+			FILE_PATH5         VARCHAR(128)                NULL,
+			FILE_PATH5_SIZ     INT                         NULL,
+			EXPIRETIME         VARCHAR(10) DEFAULT '43200' NOT NULL,
+			SENTDATE           DATETIME                    NULL,
+			RSLTDATE           DATETIME                    NULL,
+			REPORTDATE         DATETIME                    NULL,
+			READDATE           DATETIME                    NULL,
+			TERMINATEDDATE     DATETIME                    NULL,
+			RSLT               VARCHAR(10)                 NULL,
+			TYPE               VARCHAR(2)  DEFAULT '0'     NOT NULL,
+			TELCOINFO          VARCHAR(10)                 NULL,
+			ROUTE_ID           VARCHAR(20)                 NULL,
+			ID                 VARCHAR(20)                 NULL,
+			POST               VARCHAR(20)                 NULL,
+			ETC1               VARCHAR(64)                 NULL,
+			ETC2               VARCHAR(32)                 NULL,
+			ETC3               VARCHAR(32)                 NULL,
+			ETC4               INT                         NULL,
+			MULTI_SEQ          VARCHAR(10)                 NULL,
+			TEMPLATE_KEY       VARCHAR(20)                 NULL,
+			BAR_CODE           VARCHAR(30)                 NULL,
+			BAR_CODE_MERGE_TXT VARCHAR(256)                NULL,
+			CLI_EXT_OBJECT     VARCHAR(1024)               NULL
+		);
+
+
+	</update>
+	<select id="checkCreatedMMSLogTable" parameterType="string" resultType="int">
+		SELECT COUNT(*)
+		FROM information_schema.TABLES
+		WHERE TABLE_NAME = 'MMS_LOG_${yyyyMM}';
 	</select>
 </mapper>
