@@ -1,38 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <!-- 중간 변동 사항을 대비해, application.properties 에서 값을 가져오도록 변경 -->
     <property resource="application.properties"/>
+    <!-- LOG_ROOT_LEVEL 의 기본값은 INFO -->
     <property name="LOG_ROOT_LEVEL" value="${logging.root.level}"/>
+    <!-- LOG_ROOT_PATH 의 기본 고정값은 -->
     <property name="LOG_FILE_PATH" value="${logging.file.path}"/>
-    <property name="LOG_FILE_NAME" value="${logging.file.name}"/>
-
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>[%d{HH:mm:ss}] [%-5level] %logger{36}[line: %L] - %msg%n</Pattern>
+            <Pattern>[%d{HH:mm:ss}] [%-5level] [%M\(%L\)] - %msg%n</Pattern>
         </layout>
     </appender>
-
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${logging.file.path}/${project.name}.log</file>
+        <file>${LOG_FILE_PATH}/${project.name}.log</file>
         <encoder>
-            <Pattern>[%d{HH:mm:ss}] [%-5level] %logger{36}[line: %L] - %msg%n</Pattern>
+            <Pattern>[%d{HH:mm:ss}] [%-5level] [%M\(%L\)] - %msg%n</Pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_FILE_PATH}/${LOG_FILE_NAME}</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- or whenever the file size reaches 100MB -->
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <fileNamePattern>${LOG_FILE_PATH}/${project.name}-%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>31</maxHistory>
         </rollingPolicy>
     </appender>
-
+    <logger name="jdbc" level="OFF"/>
+    <logger name="jdbc.sqlonly" level="ERROR"/>
+    <logger name="jdbc.sqltiming" level="OFF"/>
+    <logger name="jdbc.audit" level="OFF"/>
+    <logger name="jdbc.resultset" level="OFF"/>
+    <logger name="jdbc.resultsettable" level="OFF"/>
+    <logger name="jdbc.connection" level="INFO"/>
     <root level="${LOG_ROOT_LEVEL}">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE" />
     </root>
-    <logger name="kr.co.ooweat.taskScheduler" level="${LOG_ROOT_LEVEL}" additivity="false">
+    <logger name="kr.co.ubcn" level="${LOG_ROOT_LEVEL}" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE" />
     </logger>
-
 </configuration>
