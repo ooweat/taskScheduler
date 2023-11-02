@@ -256,7 +256,7 @@ public class Util {
         }
     }
 
-    public static HashMap<String, String> connectVM(ServerDescEnum serverDescEnum, int option) {
+    public static Map<String, Object> connectVM(ServerDescEnum serverDescEnum, int option) {
         int port = 22;
         String user = "ooweat";
         String password = "";
@@ -273,7 +273,7 @@ public class Util {
         Channel channel = null;
         String[] commandCustom = null;
         BufferedReader commandReader = null;
-        HashMap<String, String> hmap = new HashMap<>();
+        Map<String, Object> hmap = new HashMap<>();
 
         // 2. 세션 객체를 생성한다 (사용자 이름, 접속할 호스트, 포트를 인자로 준다.)
         try {
@@ -346,7 +346,7 @@ public class Util {
     //DESC: alter 모델에 맞게 설정해주도록 설정 2
     public static AlertModel alertModelMaking(String receiver, String templateType, String service,
                                               String title,
-                                              String content, String sendDate, List<HashMap<String, String>> paramListMap) {
+                                              String content, String sendDate, List<Map<String, Object>> paramListMap) {
         AlertModel alertModel = new AlertModel();
         alertModel.setReceiver(receiver);
         alertModel.setTemplateType(templateType);
