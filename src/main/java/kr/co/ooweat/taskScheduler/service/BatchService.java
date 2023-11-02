@@ -1,10 +1,20 @@
 package kr.co.ooweat.taskScheduler.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.ooweat.taskScheduler.common.Alert;
 import kr.co.ooweat.taskScheduler.common.ServerDescEnum;
 import kr.co.ooweat.taskScheduler.common.Util;
 import kr.co.ooweat.taskScheduler.model.AlertModel;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Service;
@@ -14,8 +24,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.*;
+import org.springframework.util.ObjectUtils;
 
 import static kr.co.ooweat.taskScheduler.common.ServerDescEnum.SERVICE_KAKAO_ALERT;
+import static kr.co.ooweat.taskScheduler.common.Util.alertModelMaking;
 
 /**
  * The type Batch service
@@ -28,7 +40,7 @@ public class BatchService {
     //DESC: VM 디스크 용량 알림 메소드
     public void vmDiskUsageCheck() throws IOException, MessagingException {
         //NOTE: twkim 2023.02.22 리팩토링으로 인한 코드 수정
-        List<HashMap<String, String>> dataList = new ArrayList<>();
+        List<Map<String, Object>> dataList = new ArrayList<>();
         for (ServerDescEnum serverDescEnum : ServerDescEnum.values()) {
             dataList.add(Util.connectVM(serverDescEnum, 2));
         }
@@ -67,7 +79,7 @@ public class BatchService {
         return alertModel;
     }
 
-    private AlertModel alertModelMaking(String receiver, String templateType, String service, String title, String content, String sendDate, List<HashMap<String, String>> paramListMap) {
+    private AlertModel alertModelMaking(String receiver, String templateType, String service, String title, String content, String sendDate, List<Map<String, Object>> paramListMap) {
         AlertModel alertModel = new AlertModel();
         alertModel.setReceiver(receiver);
         alertModel.setTemplateType(templateType);
@@ -100,6 +112,65 @@ public class BatchService {
         } else {
             Alert.kakaoAlert(alertModelMaking("system", "RM", "createTable",
                 "※MariaDB", "월별 테이블 생성 실패 ", Util.dateUtils().now()));
+        }
+    }
+    
+    public void remainCheck(List<Map<String, String>> placeList) throws MessagingException, UnsupportedEncodingException {
+        try {
+            for (Map<String, String> rule : placeList) {
+                List<Map<String, Object>> remainSeatList = new ArrayList<>();
+                int remainCount = 0;
+                HttpClient client = HttpClientBuilder.create().build(); // HttpClient 생성
+                HttpGet getRequest = new HttpGet(rule.get("api-url")); //GET 메소드 URL 생성
+                //getRequest.addHeader("x-api-key", none); //KEY 입력
+            
+                HttpResponse response = client.execute(getRequest);
+            
+                //Response 출력
+                if (response.getStatusLine().getStatusCode() == 200) {
+                    ResponseHandler<String> handler = new BasicResponseHandler();
+                    String body = handler.handleResponse(response);
+                    JSONParser jsonParser = new JSONParser();
+                
+                    JSONObject convertedObject = (JSONObject) jsonParser.parse(body);
+                    JSONObject resDataObject = (JSONObject) convertedObject.get("data");
+                
+                    for (Object jsonObject : (JSONArray) resDataObject.get("remainSeat")) {
+                        JSONObject toastObject = (JSONObject) jsonObject;
+                        remainCount += Integer.parseInt(
+                            String.valueOf((Long) toastObject.get("remainCnt")));
+                        remainSeatList.add(getMapFromJSONObject((JSONObject) jsonObject));
+                    }
+                    //10월 23일
+                
+                } else {
+                    System.out.println(
+                        "response is error : " + response.getStatusLine().getStatusCode());
+                }
+            
+                if (remainCount > 0) {
+                    Alert.smtp(alertModelMaking("ooweat@kakao.com", "ALERT", "remain",
+                        rule.get("place"), rule.get("site-url"), Util.dateUtils().now(), remainSeatList));
+                } else {
+                    log.info("0");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println(e.toString());
+        }
+    }
+    
+    public static Map<String, Object> getMapFromJSONObject(JSONObject obj) {
+        if (ObjectUtils.isEmpty(obj)) {
+            log.error("BAD REQUEST obj : {}", obj);
+            throw new IllegalArgumentException(String.format("BAD REQUEST obj %s", obj));
+        }
+        
+        try {
+            return new ObjectMapper().readValue(obj.toString(), Map.class);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 }

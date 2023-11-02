@@ -1,5 +1,6 @@
 package kr.co.ooweat.taskScheduler.model;
 
+import java.util.Map;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -16,5 +17,5 @@ public class AlertModel {
 	String sendDate;
 
 	HashMap<String, String> paramMap;	//Map 형식의 파라미터
-	List<HashMap<String, String>> paramListMap;	//List<Map> 형식의 파라미터
+	List<Map<String, Object>> paramListMap;	//List<Map> 형식의 파라미터
 }

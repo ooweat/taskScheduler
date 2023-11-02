@@ -1,9 +1,12 @@
 package kr.co.ooweat.taskScheduler.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import kr.co.ooweat.taskScheduler.service.BatchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -43,16 +46,35 @@ public class BatchController {
     //NOTE: 2023.03.13 twkim 영업일로 별도 처리
     @Scheduled(cron = "${batch.ones.9AM.crond}") // 아침 9시 한 번(영업일)
     public void ones9AMWorkTime() throws IOException, MessagingException {
-
         if (isWorkDay()) {    //작업일(오늘)이 영업일이면 진행~
 
         }
     }
-
+    
+    @Scheduled(cron = "${batch.10sec.crond}")
+    public void in10sec() throws MessagingException, UnsupportedEncodingException {
+        List<Map<String, String>> placeList = new ArrayList<>();
+        Map<String, String> placeSetup = new HashMap<>();
+        placeSetup = new HashMap<>();
+        placeSetup.put("place", "천왕산");
+        placeSetup.put("api-url",
+            "https://api-ticketfront.interpark.com/v1/goods/21012652/playSeq/PlaySeq/684/REMAINSEAT");
+        placeSetup.put("site-url", "https://tickets.interpark.com/goods/21012652#");
+        placeList.add(placeSetup);
+    
+        placeSetup = new HashMap<>();
+        placeSetup.put("place", "노을진캠핑장");
+        placeSetup.put("api-url",
+            "https://api-ticketfront.interpark.com/v1/goods/22011899/playSeq/PlaySeq/316/REMAINSEAT");
+        placeSetup.put("site-url", "https://tickets.interpark.com/goods/22011899#");
+        placeList.add(placeSetup);
+        
+        batchService.remainCheck(placeList);
+    }
+    
     @Scheduled(cron = "${batch.1min.crond}") // 1분마다
     public void every1Min() throws UnsupportedEncodingException, MessagingException {
-
-        batchService.processAliveCheck();
+        //batchService.processAliveCheck();
     }
 
     @Scheduled(cron = "${batch.5min.crond}") // 5분마다
