@@ -1,6 +1,5 @@
 # Compiled class file
 *.class
-
 #Test File
 /test/
 **/test
@@ -47,3 +46,4 @@ rebel.xml
 .gradle
 /build/
 .gradletasknamecache
+src/main/java/kr/co/ooweat/taskScheduler/common/OOWEAT.java
