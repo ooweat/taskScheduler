@@ -51,8 +51,8 @@ public class BatchController {
         }
     }
     
-    @Scheduled(cron = "${batch.10sec.crond}")
-    public void in10sec() throws MessagingException, UnsupportedEncodingException {
+    @Scheduled(cron = "${batch.30sec.crond}")
+    public void in30sec() throws MessagingException, UnsupportedEncodingException {
         List<Map<String, String>> placeList = new ArrayList<>();
         Map<String, String> placeSetup = new HashMap<>();
         placeSetup = new HashMap<>();
