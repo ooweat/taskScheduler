@@ -224,7 +224,7 @@ public class Alert {
                         seatType+": "+ remainCount + "석 남음</td>" +
                         "</tr>");
                 }
-                sb.append("<br><tr><a href='"+alertModel.getContent()+"' target='_blank'>예매 링크</a></tr>");
+                sb.append("<br><tr><td><a href='"+alertModel.getContent()+"' target='_blank'><h1>예매 링크</h1></a></td></tr>");
                 sb.append("<br><tr>" +
                     "<td style=\"margin:0; background-color: white; padding:0 0 0; font-size:14px; letter-spacing:-1px; color:#000000; font-family:'Malgun Gothic', '맑은고딕', dotum,'돋움',sans-serif; line-height:24px;\">\n"
                     + "감사합니다." +
