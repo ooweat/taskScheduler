@@ -152,7 +152,7 @@ public class BatchService {
                     Alert.smtp(alertModelMaking("ooweat@kakao.com", "ALERT", "remain",
                         rule.get("place"), rule.get("site-url"), Util.dateUtils().now(), remainSeatList));
                 } else {
-                    log.info("0");
+                    log.info("자리가 없습니다.");
                 }
             }
         } catch (Exception e) {
