@@ -1,4 +1,4 @@
-package kr.co.ooweat.taskScheduler.controller;
+package kr.co.ooweat.taskScheduler.task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import java.io.UnsupportedEncodingException;
 @CrossOrigin("*")
 @EnableAutoConfiguration
 @RestController
-public class BatchController {
+public class BatchTask {
 
     @Autowired
     private BatchService batchService;
@@ -55,7 +55,7 @@ public class BatchController {
     public void in30sec() throws MessagingException, UnsupportedEncodingException {
         List<Map<String, String>> placeList = new ArrayList<>();
         Map<String, String> placeSetup = new HashMap<>();
-        placeSetup = new HashMap<>();
+/*        placeSetup = new HashMap<>();
         placeSetup.put("place", "천왕산");
         placeSetup.put("api-url",
             "https://api-ticketfront.interpark.com/v1/goods/21012652/playSeq/PlaySeq/684/REMAINSEAT");
@@ -67,9 +67,16 @@ public class BatchController {
         placeSetup.put("api-url",
             "https://api-ticketfront.interpark.com/v1/goods/22011899/playSeq/PlaySeq/316/REMAINSEAT");
         placeSetup.put("site-url", "https://tickets.interpark.com/goods/22011899#");
+        placeList.add(placeSetup);*/
+        placeSetup = new HashMap<>();
+        placeSetup.put("place", "영등포 제2 스포츠센터");
+        placeSetup.put("api-url",
+            "https://api-ticketfront.interpark.com/v1/goods/22011899/playSeq/PlaySeq/316/REMAINSEAT");
+        placeSetup.put("site-url", "https://tickets.interpark.com/goods/22011899#");
         placeList.add(placeSetup);
-        
         batchService.remainCheck(placeList);
+        
+        
     }
     
     @Scheduled(cron = "${batch.1min.crond}") // 1분마다
